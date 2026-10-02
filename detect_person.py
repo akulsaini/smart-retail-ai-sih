@@ -5,7 +5,7 @@ import cv2
 model = YOLO("yolov8n.pt")
 
 # 2. Start webcam inference
-results = model.predict(
+results = model.track(
     source=0,
     stream=True,
     conf=0.5,

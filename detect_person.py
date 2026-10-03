@@ -1,137 +1,98 @@
-from ultralytics import YOLO
+from collections import defaultdict
 import cv2
+from ultralytics import YOLO
 
-# 1. Load the pretrained YOLO model
+# Load YOLO model
 model = YOLO("yolov8n.pt")
 
-# 2. Start webcam inference
+# Store previous center positions for each track ID
+track_history = defaultdict(list)
+
+# Start tracking
 results = model.track(
-    source=0,
-    stream=True,
-    conf=0.5,
-    classes=[0],
-    show=False,
-    persist=True
+    source=0, stream=True, conf=0.5, classes=[0], show=False, persist=True
 )
 
 try:
+  for result in results:
+    frame = result.orig_img
 
-# 3. Process every camera frame
-    for result in results:
+    # Safety check
+    if frame is None:
+      print("Warning: Camera frame is unavailable. Skipping this frame.")
+      continue
 
-        # Get the original frame
-        frame = result.orig_img
+      # GET FRAME DIMENSIONS (Height and Width)
 
-        # Check whether the frame actually exists
-        if frame is None:
-            # "Warning: Camera frame is unavailable. Skipping this frame."
-            continue
+    h, w, _ = frame.shape
 
-        # GET FRAME DIMENSIONS (Height and Width)
-        h, w, _ = frame.shape
+    boxes = result.boxes
+    
 
-        # Get detected bounding boxes
-        boxes = result.boxes
-
-        # Process every detected person
-        for box in boxes:
-
-            # -----------------------------
-            # A. Get bounding box coordinates
-            # -----------------------------
-            x1, y1, x2, y2 = box.xyxy[0].tolist()
+    if boxes is not None:
+      for box in boxes:
+        # Get bounding box
+        x1, y1, x2, y2 = box.xyxy[0].tolist()
 
             # Clamp coordinates to stay within the actual frame dimensions
-            x1 = max(0, int(x1))
-            y1 = max(0, int(y1))
-            x2 = min(w, int(x2))
-            y2 = min(h, int(y2))
-
-            # Convert coordinates to integers
-            x1 = int(x1)
-            y1 = int(y1)
-            x2 = int(x2)
-            y2 = int(y2)
-
-            # -----------------------------
-            # B. Calculate center point
-            # -----------------------------
-            center_x = int((x1 + x2) / 2)
-            center_y = int((y1 + y2) / 2)
-
-            # -----------------------------
-            # C. Get confidence
-            # -----------------------------
-            confidence = float(box.conf[0])
-
-            # -----------------------------
-            # D. Get class ID
-            # -----------------------------
-            class_id = int(box.cls[0])
-
-            # Tracking ID
-            if box.id is not None:
-                track_id = int(box.id[0])
-            else:
-                track_id = -1
+        x1 = max(0, int(x1))
+        y1 = max(0, int(y1))
+        x2 = min(w, int(x2))
+        y2 = min(h, int(y2))
 
 
-            # -----------------------------
-            # E. Draw bounding box
-            # -----------------------------
-            cv2.rectangle(
-                frame,
-                (x1, y1),
-                (x2, y2),
-                (0, 255, 0),
-                2
-            )
+        x1, y1, x2, y2 = map(int, (x1, y1, x2, y2))
 
-            # -----------------------------
-            # F. Draw center point
-            # -----------------------------
-            cv2.circle(
-                frame,
-                (center_x, center_y),
-                6,
-                (0, 0, 255),
-                -1
-            )
+        # Confidence
+        confidence = float(box.conf[0])
 
-            # -----------------------------
-            # G. Display information
-            # -----------------------------
+        # Track ID (safely handle tensor conversion)
+        if box.id is not None:
+          track_id = int(box.id[0].item())
+        else:
+          track_id = -1
 
-            label = (
-                f"ID: {track_id} "
-                f"Conf: {confidence:.2f} "
-                f"Center: ({center_x},{center_y})"
-            )
+        # Center
+        center_x = int((x1 + x2) / 2)
+        center_y = int((y1 + y2) / 2)
 
+        # Store trajectory only for valid IDs
+        if track_id != -1:
+          track_history[track_id].append((center_x, center_y))
 
-            cv2.putText(
-                frame,
-                label,
-                (x1, max(y1 - 10, 20)),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.55,
-                (0, 255, 0),
-                2
-            )
+          # Keep latest 30 points
+          if len(track_history[track_id]) > 30:
+            track_history[track_id].pop(0)
 
-            print(
-                f"ID: {track_id} | "
-                f"Confidence: {confidence:.2f} | "
-                f"Center: ({center_x}, {center_y})"
-            )
+          # Draw trajectory
+          points = track_history[track_id]
+          for i in range(1, len(points)):
+            cv2.line(frame, points[i - 1], points[i], (0, 255, 255), 2)
 
-        # 4. Display the processed frame
-        cv2.imshow("Smart Retail - Person Detection", frame)
+        # Draw bounding box
+        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-        # 5. Press Q to exit
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+        # Draw center
+        cv2.circle(frame, (center_x, center_y), 5, (0, 0, 255), -1)
+
+        # Display ID and confidence
+        label = f"ID: {track_id} | Conf: {confidence:.2f}"
+        cv2.putText(
+            frame,
+            label,
+            (x1, max(y1 - 10, 20)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            (255, 255, 255),
+            2,
+        )
+
+    # Display frame
+    cv2.imshow("Retail AI - Person Tracking", frame)
+
+    # Press Q to quit
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+      break
 
 finally:
-    # 6. Close camera window
-    cv2.destroyAllWindows()
+  cv2.destroyAllWindows()

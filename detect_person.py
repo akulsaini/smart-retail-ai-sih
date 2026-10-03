@@ -10,7 +10,12 @@ track_history = defaultdict(list)
 
 # Start tracking
 results = model.track(
-    source=0, stream=True, conf=0.5, classes=[0], show=False, persist=True
+    source=0, 
+    stream=True, 
+    conf=0.65, 
+    classes=[0], 
+    show=False, 
+    persist=True
 )
 
 try:
@@ -96,3 +101,5 @@ try:
 
 finally:
   cv2.destroyAllWindows()
+  if hasattr(results, "close"):
+      results.close()

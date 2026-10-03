@@ -1,0 +1,5 @@
+# to activate the local environment of the project
+ 
+		 .\venv\Scripts\Activate.ps1  
+
+# to stop the running state press "q"

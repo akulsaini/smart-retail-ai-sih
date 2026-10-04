@@ -12,7 +12,7 @@ customers_inside = 0
 
 # Start tracking
 results = model.track(
-    source=0, 
+    source=1, 
     stream=True, 
     conf=0.65, 
     classes=[0], 
@@ -63,11 +63,11 @@ try:
         center_x = int((x1 + x2) / 2)
         center_y = int((y1 + y2) / 2)
 
+        ENTRANCE_Y = int(h * 0.7)  # Define the entrance line at the middle of the frame
+        LINE_TOLERANCE = 2
+
         # Store trajectory only for valid IDs
         if track_id != -1:
-
-          ENTRANCE_Y = 300 #int(h * 0.9)  # Define the entrance line at the middle of the frame
-          LINE_TOLERANCE = 5
 
           if center_y < ENTRANCE_Y - LINE_TOLERANCE:
                 current_position = "INSIDE"
@@ -97,7 +97,6 @@ try:
                     print(f"Customers inside: {customers_inside}")
 
                                         
-          print(f"Customers inside: {customers_inside}")
                 
           # Update previous position for this specific ID
           previous_position[track_id] = current_position

@@ -7,7 +7,7 @@ model = YOLO("yolov8n.pt")
 
 # Store previous center positions for each track ID
 track_history = defaultdict(list)
-previous_y = {}
+previous_position = {}
 customers_inside = 0
 
 # Start tracking
@@ -65,28 +65,42 @@ try:
 
         # Store trajectory only for valid IDs
         if track_id != -1:
-          if track_id in previous_y:
 
-            old_y = previous_y[track_id]
-            new_y = center_y
+          ENTRANCE_Y = 300 #int(h * 0.9)  # Define the entrance line at the middle of the frame
+          LINE_TOLERANCE = 5
 
-            # Outside → Inside (adjust inequalities based on camera layout)
-            if old_y > ENTRANCE_Y and new_y <= ENTRANCE_Y:
-              print(f"ID {track_id} → CUSTOMER_ENTRY")
-              customers_inside += 1
-              print(f"Current Customers Inside: {customers_inside}")
+          if center_y < ENTRANCE_Y:
+                current_position = "INSIDE"
+          elif center_y > ENTRANCE_Y:
+                current_position = "OUTSIDE"
+          else:
+                current_position = "ON_LINE"
+          
+          if track_id in previous_position:
+                previous_position_value = previous_position[track_id]
 
-            # Inside → Outside
-            elif old_y < ENTRANCE_Y and new_y >= ENTRANCE_Y:
-              print(f"ID {track_id} → CUSTOMER_EXIT")
-              customers_inside -= 1
-              print(f"Current Customers Inside: {customers_inside}")
+                if previous_position_value == "OUTSIDE" and current_position == "ON_LINE":
+                    print(f"ID {track_id} → ON_LINE")
 
+                elif previous_position_value == "ON_LINE" and current_position == "INSIDE":
+                    customers_inside += 1
+                    print(f"ID {track_id} → CUSTOMER_ENTRY")
+                    print(f"Customers inside: {customers_inside}")
 
-            customers_inside = max(customers_inside, 0)  # Prevent negative count
-            
+                elif previous_position_value == "INSIDE" and current_position == "ON_LINE":
+                    print(f"ID {track_id} → ON_LINE")
+
+                elif previous_position_value == "ON_LINE" and current_position == "OUTSIDE":
+                    customers_inside -= 1
+                    customers_inside = max(customers_inside, 0)  # Prevent negative count
+                    print(f"ID {track_id} → CUSTOMER_EXIT")
+                    print(f"Customers inside: {customers_inside}")
+
+                                        
+          print(f"Customers inside: {customers_inside}")
+                
           # Update previous position for this specific ID
-          previous_y[track_id] = center_y
+          previous_position[track_id] = current_position
 
           track_history[track_id].append((center_x, center_y))
 
@@ -104,8 +118,6 @@ try:
 
         # Draw center
         cv2.circle(frame, (center_x, center_y), 5, (0, 0, 255), -1)
-
-        ENTRANCE_Y = 300
 
 
         # Display ID and confidence

@@ -69,9 +69,9 @@ try:
           ENTRANCE_Y = 300 #int(h * 0.9)  # Define the entrance line at the middle of the frame
           LINE_TOLERANCE = 5
 
-          if center_y < ENTRANCE_Y:
+          if center_y < ENTRANCE_Y - LINE_TOLERANCE:
                 current_position = "INSIDE"
-          elif center_y > ENTRANCE_Y:
+          elif center_y > ENTRANCE_Y + LINE_TOLERANCE:
                 current_position = "OUTSIDE"
           else:
                 current_position = "ON_LINE"

@@ -68,6 +68,9 @@ The system uses YOLO-based computer vision and object tracking to:
 
 ### Architecture for the project
 
+The proposed smart retail architecture combines camera-based computer vision, shelf sensors, edge AI processing, and local store intelligence.
+
+```text
               SMART RETAIL STORE
                      │
         ┌────────────┴────────────┐
@@ -93,6 +96,13 @@ The system uses YOLO-based computer vision and object tracking to:
           ┌─────────┴─────────┐
           ▼                   ▼
      Local Dashboard       Alerts
+```
+
+**Current implementation:** The project currently implements the camera-based people-intelligence layer, including YOLO person detection, tracking, trajectory analysis, entrance-line state detection, entry/exit events, and customer occupancy counting.
+
+**Planned expansion:** Queue analysis, inventory visibility, shelf sensors, sensor fusion, local dashboarding, and proactive alerts represent the broader smart-retail architecture and future development stages.
+
+---
 
 ## System Architecture till now
 

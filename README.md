@@ -559,7 +559,7 @@ The tracking system assigns a temporary unique ID to each detected person, allow
 
 ### 3. Person Tracking and Trajectory
 
-The system maintains the recent movement history of a tracked person and visualizes the trajectory using center-point coordinates.
+The system tracks multiple detected people simultaneously, assigns tracking IDs, and maintains their recent movement history using center-point coordinates.
 
 ![Person Tracking](screenshots/track_multiple_id.png)
 
@@ -575,8 +575,6 @@ The state machine detects an INSIDE -> ON_LINE -> OUTSIDE transition and registe
 
 ![Customer Exit](screenshots/exit_event.png)
 
-### 6. Multiple-Person Tracking
+### 6. No-Person Frame Handling
 
-The system can simultaneously track multiple people and maintain the customer occupancy count based on detected entry and exit events.
-
-![Multiple Person Tracking](screenshots/if_no_one_discover.png)
+When a camera frame contains no detected people, the system safely continues processing instead of attempting to access missing detection data.

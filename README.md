@@ -66,7 +66,35 @@ The system uses YOLO-based computer vision and object tracking to:
 
 ---
 
-## System Architecture
+### Architecture for the project
+
+              SMART RETAIL STORE
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+   Camera / Sensors          Shelf Sensors
+        │                         │
+        ▼                         ▼
+ ┌─────────────────────────────────────┐
+ │       EDGE AI PROCESSING UNIT       │
+ │                                     │
+ │ YOLO → Tracking → Events → Analytics│
+ └──────────────────┬──────────────────┘
+                    │
+          ┌─────────┼─────────┐
+          ▼         ▼         ▼
+       Shopper    Queue     Inventory
+       Analytics  Analysis   Visibility
+          │         │         │
+          └─────────┼─────────┘
+                    ▼
+          STORE INTELLIGENCE
+                    │
+          ┌─────────┴─────────┐
+          ▼                   ▼
+     Local Dashboard       Alerts
+
+## System Architecture till now
 
 ```text
                     CAMERA

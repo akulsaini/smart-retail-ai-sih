@@ -540,3 +540,43 @@ The current project represents the first major layer of that system: **understan
 **Implemented:** People detection, tracking, trajectory, entry/exit state detection, occupancy counting, and multi-person testing.
 
 **Next development focus:** Queue detection, customer movement analysis, and progressively expanding from people intelligence toward product and store intelligence.
+
+## Implementation Evidence
+
+The following screenshots document the current working implementation of the computer-vision pipeline.
+
+### 1. Person Detection
+
+YOLO detects people from the camera feed and identifies them as the target class.
+
+![Person Detection](screenshots/person_detection.png)
+
+### 2. Unique Tracking ID
+
+The tracking system assigns a temporary unique ID to each detected person, allowing the system to follow individual detections across consecutive frames.
+
+![Tracking ID](screenshots/provide_unique_id.png)
+
+### 3. Person Tracking and Trajectory
+
+The system maintains the recent movement history of a tracked person and visualizes the trajectory using center-point coordinates.
+
+![Person Tracking](screenshots/track_multiple_id.png)
+
+### 4. Customer Entry Event
+
+The entrance state machine detects an OUTSIDE -> ON_LINE -> INSIDE transition and registers a customer entry event.
+
+![Customer Entry](screenshots/entry_event.png)
+
+### 5. Customer Exit Event
+
+The state machine detects an INSIDE -> ON_LINE -> OUTSIDE transition and registers a customer exit event.
+
+![Customer Exit](screenshots/exit_event.png)
+
+### 6. Multiple-Person Tracking
+
+The system can simultaneously track multiple people and maintain the customer occupancy count based on detected entry and exit events.
+
+![Multiple Person Tracking](screenshots/if_no_one_discover.png)

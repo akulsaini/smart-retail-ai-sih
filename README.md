@@ -578,3 +578,5 @@ The state machine detects an INSIDE -> ON_LINE -> OUTSIDE transition and registe
 ### 6. No-Person Frame Handling
 
 When a camera frame contains no detected people, the system safely continues processing instead of attempting to access missing detection data.
+
+![No-Person Frame Handling](screenshots/if_no_one_discover.png)

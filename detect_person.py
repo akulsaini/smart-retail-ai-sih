@@ -63,8 +63,8 @@ try:
         center_x = int((x1 + x2) / 2)
         center_y = int((y1 + y2) / 2)
 
-        ENTRANCE_Y = int(h * 0.5)  # Define the entrance line at the middle of the frame
-        LINE_TOLERANCE = 2
+        ENTRANCE_Y = 300  # Define the entrance line at the middle of the frame
+        LINE_TOLERANCE = 5
 
         # Store trajectory only for valid IDs
         if track_id != -1:
